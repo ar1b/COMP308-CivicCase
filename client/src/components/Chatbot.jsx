@@ -39,6 +39,7 @@ export default function Chatbot() {
         : (data?.chatWithAI || 'No response received.')
       setMessages(m => [...m, { from: 'bot', text: reply }])
     } catch (e) {
+      console.error("Chatbot Network Error:", e); // This line reveals the true error
       setMessages(m => [...m, { from: 'bot', text: 'Sorry, I could not reach the server. Is it running?' }])
     }
   }

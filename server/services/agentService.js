@@ -20,7 +20,7 @@ function buildTools() {
     {
       name: 'get_issues_summary',
       description: 'Get a count summary of all community issues by status and urgent count',
-      schema: z.object({}),
+      schema: z.object({ run: z.boolean().optional().describe('Unused execution flag') }),
     }
   );
 
@@ -53,7 +53,7 @@ function buildTools() {
     {
       name: 'get_urgent_issues',
       description: 'Get all urgent unresolved issues needing immediate attention (Safety Hazards, Flooding, etc.)',
-      schema: z.object({}),
+      schema: z.object({ run: z.boolean().optional().describe('Unused execution flag') }),
     }
   );
 
@@ -68,7 +68,7 @@ function buildTools() {
     {
       name: 'get_category_breakdown',
       description: 'Get a breakdown of issues by category, sorted by frequency — useful for trend analysis',
-      schema: z.object({}),
+      schema: z.object({ run: z.boolean().optional().describe('Unused execution flag') }),
     }
   );
 

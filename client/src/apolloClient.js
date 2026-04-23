@@ -11,7 +11,7 @@ const authLink = new ApolloLink((operation, forward) => {
 
 const routingLink = new ApolloLink((operation, forward) => {
   const name = operation.operationName || ''
-  let uri = 'http://localhost:4002/graphql'         // default → Issue Service
+  let uri = 'http://localhost:4002/graphql'         
 
   if (AUTH_OPS.includes(name))       uri = 'http://localhost:4001/graphql'
   else if (ANALYTICS_OPS.includes(name)) uri = 'http://localhost:4003/graphql'
