@@ -1,9 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
+import NotificationBell from './NotificationBell'
 
 export default function Navbar() {
   const navigate = useNavigate()
-  const token = localStorage.getItem('token')
-  const role = localStorage.getItem('role')
+  const token    = localStorage.getItem('token')
+  const role     = localStorage.getItem('role')
   const username = localStorage.getItem('username')
 
   const logout = () => {
@@ -20,15 +21,24 @@ export default function Navbar() {
           <>
             <Link to="/" className="hover:underline">My Issues</Link>
             <Link to="/submit" className="hover:underline">Report Issue</Link>
-            <Link to="/analytics" className="hover:underline">Analytics</Link>
-            {role === 'staff' && <Link to="/staff" className="hover:underline font-semibold text-yellow-300">Staff Panel</Link>}
+            {role === 'staff' && (
+              <Link to="/analytics" className="hover:underline">Analytics</Link>
+            )}
+            {role === 'staff' && (
+              <Link to="/staff" className="hover:underline font-semibold text-yellow-300">Staff Panel</Link>
+            )}
+            <NotificationBell />
             <span className="text-blue-200">Hi, {username}</span>
-            <button onClick={logout} className="bg-white text-blue-700 px-3 py-1 rounded font-semibold hover:bg-blue-100">Logout</button>
+            <button onClick={logout} className="bg-white text-blue-700 px-3 py-1 rounded font-semibold hover:bg-blue-100">
+              Logout
+            </button>
           </>
         ) : (
           <>
             <Link to="/login" className="hover:underline">Login</Link>
-            <Link to="/register" className="bg-white text-blue-700 px-3 py-1 rounded font-semibold hover:bg-blue-100">Register</Link>
+            <Link to="/register" className="bg-white text-blue-700 px-3 py-1 rounded font-semibold hover:bg-blue-100">
+              Register
+            </Link>
           </>
         )}
       </div>

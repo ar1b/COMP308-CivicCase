@@ -1,8 +1,9 @@
-import { useQuery, useMutation, gql } from '@apollo/client'
 import { useState } from 'react'
+import { useQuery, useMutation, gql, ApolloProvider } from '@apollo/client'
+import { client } from '../apolloClient'
 
 const GET_ISSUES = gql`
-  query GetIssuesStaff { getIssues {
+  query { getIssues {
     id title category status location urgent createdAt
     reportedBy { username }
   }}
@@ -12,23 +13,15 @@ const UPDATE_STATUS = gql`
     updateIssueStatus(id: $id, status: $status) { id status }
   }
 `
-const DELETE_ISSUE = gql`
-  mutation DeleteIssue($id: ID!) { deleteIssue(id: $id) }
-`
+const DELETE_ISSUE = gql`mutation DeleteIssue($id: ID!) { deleteIssue(id: $id) }`
 
-const statusColors = {
-  open: 'bg-red-100 text-red-700',
-  in_progress: 'bg-yellow-100 text-yellow-700',
-  resolved: 'bg-green-100 text-green-700',
-}
-
-export default function StaffDashboard() {
+function StaffDashboardPage() {
   const { data, loading, refetch } = useQuery(GET_ISSUES)
   const [updateStatus] = useMutation(UPDATE_STATUS)
-  const [deleteIssue] = useMutation(DELETE_ISSUE)
+  const [deleteIssue]  = useMutation(DELETE_ISSUE)
   const [filter, setFilter] = useState('all')
 
-  const issues = data?.getIssues || []
+  const issues  = data?.getIssues || []
   const filtered = filter === 'all' ? issues : issues.filter(i => i.status === filter)
 
   const handleStatusChange = async (id, status) => {
@@ -65,9 +58,7 @@ export default function StaffDashboard() {
                 <p className="text-xs text-gray-400 mt-1">📂 {issue.category} {issue.urgent && '⚠️ URGENT'}</p>
               </div>
               <div className="flex items-center gap-2">
-                <select
-                  value={issue.status}
-                  onChange={e => handleStatusChange(issue.id, e.target.value)}
+                <select value={issue.status} onChange={e => handleStatusChange(issue.id, e.target.value)}
                   className="border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                   <option value="open">Open</option>
                   <option value="in_progress">In Progress</option>
@@ -85,4 +76,8 @@ export default function StaffDashboard() {
       </div>
     </div>
   )
+}
+
+export default function StaffDashboard() {
+  return <ApolloProvider client={client}><StaffDashboardPage /></ApolloProvider>
 }

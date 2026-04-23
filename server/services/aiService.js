@@ -6,7 +6,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // Categorize an issue using Gemini
 async function categorizeIssue(title, description) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const prompt = `You are a municipal issue classifier. Given this issue title and description, respond with ONLY one of these categories (no extra text): Pothole, Streetlight, Flooding, Safety Hazard, Vandalism, Garbage, Other\n\nTitle: ${title}\nDescription: ${description}`;
     const result = await model.generateContent(prompt);
     return result.response.text().trim();
@@ -16,45 +16,46 @@ async function categorizeIssue(title, description) {
   }
 }
 
-// Agentic chatbot using Gemini with context from database
-async function chatWithAI(message) {
+async function getAITrendAnalysis() {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const issues = await Issue.find().lean();
 
-    // Fetch real data to give AI context
-    const issues = await Issue.find().limit(50).lean();
-    const openCount = issues.filter(i => i.status === 'open').length;
-    const resolvedCount = issues.filter(i => i.status === 'resolved').length;
-    const inProgressCount = issues.filter(i => i.status === 'in_progress').length;
+    if (issues.length === 0) {
+      return 'No issues have been reported yet. Trends will appear once residents start submitting reports.';
+    }
 
     const categoryMap = {};
-    issues.forEach(i => {
-      categoryMap[i.category] = (categoryMap[i.category] || 0) + 1;
-    });
-    const categorySummary = Object.entries(categoryMap)
-      .map(([k, v]) => `${k}: ${v}`)
-      .join(', ');
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const recentIssues = issues.filter(i => new Date(i.createdAt) > weekAgo);
 
-    const recentIssues = issues.slice(0, 5)
-      .map(i => `- "${i.title}" (${i.category}, ${i.status})`)
-      .join('\n');
+    issues.forEach(i => { categoryMap[i.category] = (categoryMap[i.category] || 0) + 1; });
+    const topCategory = Object.entries(categoryMap).sort((a, b) => b[1] - a[1])[0];
+    const urgentCount = issues.filter(i => i.urgent && i.status !== 'resolved').length;
+    const resolutionRate = issues.length > 0
+      ? Math.round((issues.filter(i => i.status === 'resolved').length / issues.length) * 100)
+      : 0;
 
-    const systemContext = `You are CivicBot, an AI assistant for a municipal issue tracking system called CivicCase.
+    const prompt = `You are an AI analyst for a Canadian municipal issue tracking system. Analyze this data and provide 3-4 actionable insights in plain text (no markdown headers, no bullet points with special chars, just short paragraphs):
 
-Current database summary:
-- Total issues: ${issues.length}
-- Open: ${openCount}, In Progress: ${inProgressCount}, Resolved: ${resolvedCount}
-- Categories: ${categorySummary}
-- Recent issues:\n${recentIssues}
+Total issues: ${issues.length}
+Open: ${issues.filter(i => i.status === 'open').length}
+In Progress: ${issues.filter(i => i.status === 'in_progress').length}
+Resolved: ${issues.filter(i => i.status === 'resolved').length}
+Resolution rate: ${resolutionRate}%
+Urgent unresolved: ${urgentCount}
+New this week: ${recentIssues.length}
+Category breakdown: ${Object.entries(categoryMap).map(([k, v]) => `${k}(${v})`).join(', ')}
+Top category: ${topCategory ? topCategory[0] : 'N/A'}
 
-Answer resident and staff questions helpfully and concisely. If asked about specific issues, use the data above. Keep responses under 150 words.`;
+Focus on: top problem areas, resolution performance, urgent issues needing attention, and week-over-week activity. Keep it under 200 words.`;
 
-    const result = await model.generateContent(`${systemContext}\n\nUser question: ${message}`);
+    const result = await model.generateContent(prompt);
     return result.response.text().trim();
   } catch (err) {
-    console.error('Chatbot error:', err.message);
-    return 'Sorry, the AI assistant is temporarily unavailable. Please try again shortly.';
+    console.error('Trend analysis error:', err.message);
+    return 'AI trend analysis is temporarily unavailable. Please try again shortly.';
   }
 }
 
-module.exports = { categorizeIssue, chatWithAI };
+module.exports = { categorizeIssue, getAITrendAnalysis };

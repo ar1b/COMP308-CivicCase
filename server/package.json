@@ -3,15 +3,20 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "start": "node index.js",
-  "dev": "nodemon index.js"
-},
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "dev:auth": "nodemon auth-service/index.js",
+    "dev:issue": "nodemon issue-service/index.js",
+    "dev:analytics": "nodemon analytics-service/index.js",
+    "dev:all": "concurrently \"npm run dev:auth\" \"npm run dev:issue\" \"npm run dev:analytics\""
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@langchain/core": "^1.1.41",
     "@langchain/google-genai": "^2.1.27",
     "@langchain/langgraph": "^1.2.9",
     "apollo-server-express": "^3.13.0",
@@ -21,9 +26,11 @@
     "express": "^4.21.0",
     "graphql": "^16.13.2",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.5.0"
+    "mongoose": "^9.5.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "nodemon": "^3.1.14"
   }
 }
