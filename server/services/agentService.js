@@ -96,7 +96,7 @@ async function getAgent() {
   if (agentInstance) return agentInstance;
 
   const model = new ChatGoogleGenerativeAI({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.5-flash',
     apiKey: process.env.GEMINI_API_KEY,
     temperature: 0.3,
   });
@@ -137,7 +137,7 @@ async function chatWithAgent(message) {
 async function fallbackChat(message) {
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const issues = await Issue.find().limit(20).lean();
     const context = `Total issues: ${issues.length}. Recent: ${issues.slice(0, 3).map(i => i.title).join(', ')}.`;
     const result = await model.generateContent(

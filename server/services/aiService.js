@@ -6,7 +6,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // Categorize an issue using Gemini
 async function categorizeIssue(title, description) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const prompt = `You are a municipal issue classifier. Given this issue title and description, respond with ONLY one of these categories (no extra text): Pothole, Streetlight, Flooding, Safety Hazard, Vandalism, Garbage, Other\n\nTitle: ${title}\nDescription: ${description}`;
     const result = await model.generateContent(prompt);
     return result.response.text().trim();
@@ -18,7 +18,7 @@ async function categorizeIssue(title, description) {
 
 async function getAITrendAnalysis() {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const issues = await Issue.find().lean();
 
     if (issues.length === 0) {

@@ -17,7 +17,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@langchain/core": "^1.1.41",
-    "@langchain/google-genai": "^2.1.27",
+    "@langchain/google-genai": "^2.1.28",
     "@langchain/langgraph": "^1.2.9",
     "apollo-server-express": "^3.13.0",
     "bcryptjs": "^3.0.3",
